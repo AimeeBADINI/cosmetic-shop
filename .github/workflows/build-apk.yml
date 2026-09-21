@@ -45,14 +45,28 @@ jobs:
             libffi-dev \
             libssl-dev
 
+      - name: Preparer Android SDK
+        run: |
+          SDK="$HOME/.buildozer/android/platform/android-sdk"
+
+          mkdir -p "$SDK/licenses"
+
+          echo "8933bad161af4178b1185d1a37fbf41ea5269c55" > "$SDK/licenses/android-sdk-license"
+
+          echo "d56f5187479451eabf01fb78af6dfcb131a6481e" >> "$SDK/licenses/android-sdk-license"
+
+          echo "24333f8a63b6825ea9c5514f83c2829b004d1fee" >> "$SDK/licenses/android-sdk-license"
+
+          echo "Licences Android preparees."
+
       - name: Construire APK
         run: |
-          buildozer android debug
+          yes | buildozer android debug
 
       - name: Rechercher les APK
         run: |
           echo "========================================"
-          echo "RECHERCHE DES FICHIERS APK"
+          echo "RECHERCHE DES APK"
           echo "========================================"
 
           find . -type f -name "*.apk" -print
