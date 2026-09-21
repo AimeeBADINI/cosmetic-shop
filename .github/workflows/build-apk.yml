@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
 
@@ -41,26 +41,9 @@ jobs:
             zlib1g-dev \
             libncurses5-dev \
             libncursesw5-dev \
-            libtinfo5 \
             cmake \
             libffi-dev \
             libssl-dev
-
-      - name: Initialiser Buildozer
-        run: |
-          buildozer android debug
-
-      - name: Accepter les licences Android
-        run: |
-          SDK="$HOME/.buildozer/android/platform/android-sdk"
-
-          echo "SDK Android : $SDK"
-
-          if [ -d "$SDK/cmdline-tools/latest/bin" ]; then
-            yes | "$SDK/cmdline-tools/latest/bin/sdkmanager" --licenses || true
-          elif [ -d "$SDK/tools/bin" ]; then
-            yes | "$SDK/tools/bin/sdkmanager" --licenses || true
-          fi
 
       - name: Construire APK
         run: |
@@ -75,7 +58,7 @@ jobs:
           find . -type f -name "*.apk" -print
 
           echo "========================================"
-          echo "DOSSIER BIN"
+          echo "CONTENU DU DOSSIER BIN"
           echo "========================================"
 
           if [ -d "bin" ]; then
