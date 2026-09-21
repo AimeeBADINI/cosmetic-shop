@@ -20,40 +20,63 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Installer Buildozer et Cython
+      - name: Installer Buildozer
         run: |
           python -m pip install --upgrade pip
           pip install buildozer
           pip install cython==0.29.36
 
-      - name: Installer Android SDK et accepter les licences
+      - name: Installer les dependances systeme
         run: |
-          export ANDROID_HOME="$HOME/.buildozer/android/platform/android-sdk"
-          export ANDROID_SDK_ROOT="$ANDROID_HOME"
+          sudo apt-get update
+          sudo apt-get install -y \
+            git \
+            zip \
+            unzip \
+            openjdk-17-jdk \
+            autoconf \
+            automake \
+            libtool \
+            pkg-config \
+            zlib1g-dev \
+            libncurses5-dev \
+            libncursesw5-dev \
+            libtinfo5 \
+            cmake \
+            libffi-dev \
+            libssl-dev
 
-          mkdir -p "$ANDROID_HOME/licenses"
+      - name: Initialiser Buildozer
+        run: |
+          buildozer android debug
 
-          yes | sdkmanager --licenses || true
+      - name: Accepter les licences Android
+        run: |
+          SDK="$HOME/.buildozer/android/platform/android-sdk"
 
-          sdkmanager "platform-tools" \
-            "platforms;android-35" \
-            "build-tools;35.0.0"
+          echo "SDK Android : $SDK"
+
+          if [ -d "$SDK/cmdline-tools/latest/bin" ]; then
+            yes | "$SDK/cmdline-tools/latest/bin/sdkmanager" --licenses || true
+          elif [ -d "$SDK/tools/bin" ]; then
+            yes | "$SDK/tools/bin/sdkmanager" --licenses || true
+          fi
 
       - name: Construire APK
         run: |
-          yes | buildozer android debug
+          buildozer android debug
 
-      - name: Chercher les APK
+      - name: Rechercher les APK
         run: |
-          echo "===================================="
-          echo "RECHERCHE DES APK"
-          echo "===================================="
+          echo "========================================"
+          echo "RECHERCHE DES FICHIERS APK"
+          echo "========================================"
 
           find . -type f -name "*.apk" -print
 
-          echo "===================================="
-          echo "CONTENU DE BIN"
-          echo "===================================="
+          echo "========================================"
+          echo "DOSSIER BIN"
+          echo "========================================"
 
           if [ -d "bin" ]; then
             ls -lah bin
